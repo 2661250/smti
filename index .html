@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMTI 人格测试</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary-color: #a0a0a0;
+            --primary-color: #E53935; /* A strong red */
+            --primary-color-light: #ff6f60;
+            --border-color: #333333;
+            --hover-color: #2a2a2a;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            margin-bottom: 25px;
+        }
+
+        /* Start Screen */
+        #start-screen {
+            text-align: center;
+        }
+
+        #start-screen h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        #start-screen p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: var(--text-secondary-color);
+            margin-bottom: 35px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            background-image: linear-gradient(to right, var(--primary-color), var(--primary-color-light));
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+        }
+
+        /* Quiz Screen */
+        #progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease-in-out;
+        }
+
+        #question-header {
+            font-size: 1.1em;
+            color: var(--text-secondary-color);
+            margin-bottom: 10px;
+        }
+
+        #question-text {
+            font-size: 1.6em;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            min-height: 80px;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-align: left;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+        }
+
+        .option-btn:hover {
+            background-color: var(--hover-color);
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        /* Result Screen */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .result-card-left {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .result-card-left h2 {
+            font-size: 1.2em;
+            color: var(--text-secondary-color);
+            font-weight: 500;
+        }
+
+        .result-card-left .result-name {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+
+        .result-card-left .result-acronym {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .result-card-left .result-image {
+            width: 80%;
+            max-width: 200px;
+            height: auto;
+            margin: 0 auto;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .result-card-right h3 {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--text-secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .result-card-right .result-type-full {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .result-card-right .match-pill {
+            display: inline-block;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .result-card-right .match-pill span {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .result-card-right .confidence-text {
+            font-size: 1em;
+            line-height: 1.7;
+            color: var(--text-secondary-color);
+        }
+
+        .interpretation-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .interpretation-card p {
+            font-size: 1.1em;
+            line-height: 1.9;
+            color: var(--text-secondary-color);
+            white-space: pre-wrap;
+        }
+
+        .restart-btn-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .container { padding: 0; }
+            .card { border-radius: 0; padding: 30px 20px; margin-bottom: 10px; border-left: 0; border-right: 0;}
+            .result-grid { grid-template-columns: 1fr; }
+            #start-screen h1 { font-size: 2.2em; }
+            .result-card-left .result-name { font-size: 2.5em; }
+            .result-card-right .result-type-full { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active card">
+        <h1>SMTI人格测试</h1>
+        <p>探索你未曾留意的处事风格与内在偏好，请放松并凭直觉选择。</p>
+        <button class="btn" onclick="startQuiz()">开始测试</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+        <div class="card">
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="question-header"></div>
+            <h2 id="question-text"></h2>
+            <div id="options-container"></div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen">
+        <div class="result-grid">
+            <div class="card result-card-left">
+                <h2>你的人格类型是：</h2>
+                <h1 id="result-name-short" class="result-name"></h1>
+                <h3 id="result-acronym" class="result-acronym"></h3>
+                <img id="result-image" src="" alt="人格插图" class="result-image">
+            </div>
+            <div class="card result-card-right">
+                <h3>你的主类型</h3>
+                <h2 id="result-type-full" class="result-type-full"></h2>
+                <div class="match-pill">
+                    人格匹配度: <span id="match-percentage"></span>
+                </div>
+                <p class="confidence-text">
+                    该匹配度根据你的选项倾向性计算得出。数值越高，表明你的选择与该人格的核心特质越一致。
+                </p>
+            </div>
+        </div>
+        <div class="card interpretation-card">
+            <h3>该人格的简单解读</h3>
+            <p id="result-description"></p>
+        </div>
+        <div class="restart-btn-container">
+            <button class="btn" onclick="restartQuiz()">再测一次</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const personalityTypes = {
+        // 支配系
+        hrHellraiser: { name: "“家法”变态HR", acronym: "HR", description: `你对秩序的痴迷已经深入骨髓，宛如一个掌管私人领域劳动纪律的“人事部阎王”。你享受制定规则的快感，无论是“家法”还是情侣间的约定，都必须以书面形式确认，最好一式三份。你随身携带一个无形的小本本，随时记录对方的“违规操作”：迟到、顶嘴、没按时说晚安，都会被量化为KPI扣分项。\n\n在你看来，一段关系的稳定，等同于一家公司的良性运作。每一次“管教”都是一次绩效面谈，旨在优化对方的行为模式，提升整体“产出效率”。虽然在外人看来这种控制欲近乎变态，但你坚信，没有规矩不成方圆，最极致的爱，就是把对方打造成完美的“员工”。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzRhNTU2OCIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA0MCwyMCA1MCwyNSBDIDYwLDIwIDc1LDI1IDc1LDQwIFoiIGZpbGw9IiMxYTFhMWEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjUwIiByPSI0IiBmaWxsPSJ3aGl0ZSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNTAiIHI9IjQiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iNDUiIHk9IjYwIiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIzNSIgeT0iNzUiIHdpZHRoPSIzMCIgaGVpZ2h0PSI1CIgZmlsbD0iIzMzMyIvPjxyZWN0IHg9IjM1IiB5PSI4NSIgd2lkdGg9IjMwIiBoZWlnaHQ9IjUiIGZpbGw9IiMzMzMiLz48L2c+PC9zdmc+` },
+        dungeonMaestro: { name: "SM界的导演", acronym: "DIRECTOR", description: `你从不相信剧本，因为最精彩的剧情永远诞生于即兴的碰撞之中。你就是那个只给演员（你的伴侣）一个模糊设定，然后喊“Action！”的片场暴君。你的大脑是一个装满了千奇百怪道具和场景的仓库，今天可能是审讯室的冷光灯，明天就变成了热带雨林的潮湿闷热。\n\n你最大的乐趣，并非来自对方的痛苦或顺从，而是观察TA在你天马行空的指令下，如何从一开始的惊慌失措、满脸问号，到逐渐入戏，最终展现出连TA自己都未曾预料的一面。你享受这种完全掌控叙事节奏的上帝视角，每一次互动都是一部无法复制的、由你亲自执导的限制级文艺片。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2M1MzAzMCIvPjxwYXRoIGQ9Ik0gMjAsNDUgQyAyMCwzMCA4MCwzMCA4MCw0NSBMIDc1LDQwIiBmaWxsPSIjOWIyYzJjIi8+PGNpcmNsZSBjeD0iNDAiIGN5PSI1MCIgcj0iNCIgZmlsbD0id2hpdGUiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjUwIiByPSI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0gNDAsNjAgUSA1MCw2NSA2MCw2MCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PC9nPjwvc3ZnPg==` },
+        trollTyrant: { name: "胡说八道", acronym: "TROLL", description: `你的权力核心不是鞭子或锁链，而是你那张能把黑说成白、把东说成西的嘴。你是一个语言上的巨魔，享受用一本正经的语气发布逻辑混乱的指令，观察对方眉头紧锁、试图理解的样子。你可能会命令TA用左手画圆右手画方，并在TA失败后，语重心长地分析这背后深刻的哲学意义。\n\n你的统治艺术在于“精神PUA”，通过反复无常的夸奖与贬低，让对方的情绪坐上过山车。当TA被你搞得心态崩溃、开始怀疑人生时，你又会突然切换成温柔体贴模式，给予一个拥抱。你沉迷于这种由你一手制造的混乱，并坚信，能承受住你胡说八道的人，才是真爱。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2Q2OWUyZSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyMCA0MCwxNSA1MCwyNSBDIDYwLDE1IDc1LDIwIDc1LDQwIFoiIGZpbGw9IiNiNzc5MWYiLz48cGF0aCBkPSJNIDM4LDUyIEwgNDIsNDgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNTgsNDggTCA2Miw1MiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTSA0MCw2NSBRIDUwLDU1IDYwLDY1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48L2c+PC9zdmc+` },
+        riotConductor: { name: "烈性春药", acronym: "DRUG", description: `你不是一个人，而是一种行走的化学物质。你的情绪和欲望就像一瓶没有标签的烈酒，一旦开瓶，便无人能预测其后劲。理智？那是什么？在你兴头上来的时候，整个世界都得为你让路。你的风格是爆炸性的、不讲道理的，充满了原始的生命力。\n\n你不会精心策划，只会凭本能行动，像一场突如其来的龙卷风，将伴侣卷入你狂野的节奏中。你追求的是那种肾上腺素飙升到极限、大脑完全被多巴胺占据的瞬间。当风暴过去，你可能会累得一根手指都不想动，甚至不记得刚才具体发生了什么，但那种极致的能量释放，就是你存在的意义。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzgwNWFkNSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAzNSwxMCA2NSwxMCA3NSw0MCBMIDcwLDQ1IEwgMzAsNDUgWiIgZmlsbD0iIzZiNDZjMSIvPjxwYXRoIGQ9Ik0gMzUsNDggTCA0NSw1NSBNIDQ1LDQ4IEwgMzUsNTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNTUsNDggTCA2NSw1NSBNIDY1LDQ4IEwgNTUsNTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjQwIiB5PSI2NSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjQiIGZpbGw9IndoaXRlIiByeD0iMiIvPjwvZz48L3N2Zz4=` },
+        painAccountant: { name: "痛苦会计师", acronym: "AUDITOR", description: `你是掌管“痛苦资产负债表”的注册会计师，对数字和平衡有着近乎变态的执着。在你眼中，每一次犯错都是一笔需要偿还的“应付账款”，而每一次惩罚则是确保“账目平衡”的必要审计流程。你会清晰地记得对方欠了你“五下屁股”还是“十分钟的罚站”。\n\n你的工具不是鞭子，而是计算器和Excel表格。你享受这种冷静、客观、精确到小数点的控制方式。在执行“还债”时，你一丝不苟，没有个人情绪，仿佛只是在处理一笔笔冰冷的交易。你坚信，在这种绝对的公平与清算中，存在着一种独特的美感和秩序。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzM4YTE2OSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA3NSwyNSA3NSw0MCIgZmlsbD0iIzJmODU1YSIvPjxyZWN0IHg9IjM1IiB5PSI0NSIgd2lkdGg9IjgiIGhlaWdodD0iOCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PHJlY3QgeD0iNTciIHk9IjQ1IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0MCIgeT0iNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyIiBmaWxsPSJ3aGl0ZSIvPjwvZz48L3N2Zz4=` },
+        hannibal: { name: "汉尼拔", acronym: "HANNIBAL", description: `你是一位优雅的、拥有博士学位的“美食家”，而你的伴侣，就是你眼中最值得细细品味的珍馐。你的支配并非源于暴力，而是源于深刻的洞察力和心理剖析。你享受的，是像汉尼拔·莱克特一样，看穿对方的伪装，洞悉其内心最深处的恐惧与渴望。\n\n你的手段极其精妙，可能只是一句话、一个眼神，或是一种精心布置的氛围，就能让对方的心理防线层层瓦解。你对人体和感官的研究达到了学术级别，擅长用最文明的方式，制造最野蛮的战栗。你不是在玩SM，你是在进行一场关于人性弱点的艺术创作。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2RkNmIyMCIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA3NSwyNSA3NSw0MCIgZmlsbD0iI2MwNTYyMSIvPjxwYXRoIGQ9Ik0gMzgsNDggQSA1IDUgMCAwIDEgNDIsNDgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNTgsNDggQSA1IDUgMCAwIDEgNjIsNDgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNDAsNjIgUSA1MCw2OCA2MCw2MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMzAiIHk9IjcwIiB3aWR0aD0iNDAiIGhlaWdodD0iMjAiIGZpbGw9IiNlN2VhZTAiLz48cGF0aCBkPSJNIDMwLDcwIEwgMjUsOTAgTCA3NSw5MCBMIDcwLDcwIFoiIGZpbGw9IiNjNmQwZGUiLz48L2c+PC9zdmc+` },
+        comedian: { name: "喜剧演员", acronym: "COMEDY", description: `对你来说，SM的“S”首先代表的是“Silly”（滑稽）。你是一个天生的喜剧演员，而施虐只是你众多表演形式中的一种。你热衷于设计各种充满戏剧性、甚至有点无厘头的“惩罚”环节，其核心目的不是为了让对方痛苦，而是为了看TA出糗的样子。\n\n你是最容易笑场的支配者，经常因为对方滑稽的求饶姿势、或者自己设计的道具太离谱而笑到岔气。你享受的是那种双方都心知肚明“这是在演戏”的默契感。如果一场互动下来，两个人的腹肌不是因为紧张，而是因为大笑而酸痛，那么在你看来，这就是最完美的演出。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzMxODJjZSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyMCA3NSwyMCA3NSw0MCIgZmlsbD0iIzJiNmNiMCIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNTAiIHI9IjQiIGZpbGw9IndoaXRlIi8+PGNpcmNsZSBjeD0iNjAiIGN5PSI1MCIgcj0iNCIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNIDQwLDYwIEMgNDUsNzAgNTUsNzAgNjAsNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjwvZz48L3N2Zz4=` },
+        emotionalNuke: { name: "情感核弹", acronym: "NUKE", description: `你是行走的“脏弹”，不以物理伤害见长，却能造成大范围的情感辐射污染。你的支配力源于你那极不稳定、极具爆发力的情绪核心。一旦进入状态，你会关闭所有理智的安全阀，将最原始的喜怒哀乐毫无保留地倾泻而出。\n\n你追求的不是循序渐进的调教，而是一场能让双方精神“系统崩溃”的情感风暴。你享受将伴侣的情绪推向极限，看着TA在你制造的极端情境中（可能是极度的恐惧，也可能是极度的感动）彻底失控、哭泣、崩溃。你坚信，只有在理智的废墟之上，才能建立最深刻、最牢固的情感链接。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2U1M2UzZSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAzNSw1IDY1LDUgNzUsNDAgTCA3MCwzNSBMIDMwLDM1IFoiIGZpbGw9IiNjNTMwMzAiLz48cGF0aCBkPSJNIDM1LDUyIEwgNDUsNDggTSA0MCw0NSBMIDQwLDU1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDU1LDUyIEwgNjUsNDggTSA2MCw0NSBMIDYwLDU1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDQwLDY4IFE1MCw2MCA2MCw2OCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PC9nPjwvc3ZnPg==` },
+        
+        // 顺从系
+        goodDog: { name: "乖乖狗", acronym: "GOODBOY", description: `你内心深处住着一只等待主人抚摸的金毛巡回犬。对你来说，世界上最大的幸福，莫过于听到那句“真乖”。你的快乐源泉简单而纯粹：被认可、被夸奖、被需要。你对规则和指令的遵守近乎本能，因为在你看来，服从是表达爱与忠诚的最直接方式。\n\n你享受那种被安排得明明白白的安全感，放弃选择对你不是束缚，而是一种解脱。你可能会因为一个赞许的眼神而摇起无形的尾巴，也会因为犯了小错而耷拉下耳朵。你不需要复杂的剧情，只需要一个清晰的指令和一个温暖的拥抱，就能获得全世界。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzQyOTllMSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA3NSwyNSA3NSw0MCIgZmlsbD0iIzJjNTI4MiIvPjxyZWN0IHg9IjM1IiB5PSI3MCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMmI2Y2IwIiByeD0iNSIvPjxwYXRoIGQ9Ik0gMzgsNTIgQSA1IDUgMCAwIDAgNDIsNTIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNTgsNTIgQSA1IDUgMCAwIDAgNjIsNTIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNDAsNjIgUSA1MCw2OCA2MCw2MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9nPjwvc3ZnPg==` },
+        sensitiveDog: { name: "敏感狗", acronym: "SENSITIVE", description: `你的身体和情绪就像一台顶级的高精度科学仪器，能探测到最微弱的信号。无论是空气中暧昧的氛围，还是对方语气里一丝丝的变化，都足以在你的内心掀起波澜。你的皮肤是敏感的，泪腺是发达的，共情能力更是满格的。\n\n你很容易被感动，也很容易被“玩坏”。对你而言，体验的深度远比强度重要。你享受那种情绪被慢慢浸润、直至完全融化的过程。你的战栗和眼泪，并非软弱，而是对当前体验最真实、最珍贵的反馈。你就像一只警惕而又粘人的小狗，时刻感受着主人的喜怒，并以最直接的方式作出回应。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2Y2ODdiMyIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA3NSwyNSA3NSw0MCIgZmlsbD0iI2I4MzI4MCIvPjxwYXRoIGQ9Ik0gMzUsNTAgQyAzMCw2MCA0NSw2MCw0MCw1MCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PHBhdGggZD0iTSA1NSw1MCBDIDUwLDYwIDY1LDYwIDYwLDUwIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNIDQ1LDY1IFE1MCw2MCA1NSw2NSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PC9nPjwvc3ZnPg==` },
+        rebelDog: { name: "作死欠操", acronym: "REBEL", description: `你的字典里没有“害怕”，只有“好玩”。你的人生信条就是“No Zuo No Die, Why Me Try”。你天生反骨，尤其享受在规则的边缘疯狂试探。对方越是强调“不许”，你就越是想看看“然后呢？”你的挑衅不是为了推翻统治，而是为了引诱对方火力全开。\n\n你通过顶嘴、抬杠、阳奉阴违等一系列操作，来测试对方的底线和耐心。你享受的就是那个“把老虎惹毛”的过程，期待着对方忍无可忍、彻底爆发，然后把你摁住狠狠“教育”一顿的完整闭环。对你来说，前戏从作死开始，高潮在被收拾时到来。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzcxODA5NiIvPjxwYXRoIGQ9Ik0gMjUsNDAgTCA1MCw1NSBMIDc1LDQwIFoiIGZpbGw9IiM0YTU1NjgiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjUwIiByPSI0IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0gNTgsNTIgTCA2Miw0OCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTSA0MCw2OCBRIDUwLDYwIDYwLDY4IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+` },
+        wildDog: { name: "疯骚狗", acronym: "WILD", description: `你内心有一匹渴望在草原上脱缰狂奔的野马，只不过被狗的外表所掩盖。你厌恶一成不变的日常，渴望混乱、刺激和不可预测。你享受被即兴的、疯狂的指令所支配，那种大脑来不及思考、身体已经先一步行动的失控感让你无比着迷。\n\n“骚”是你的天性，你从不掩饰自己的欲望，并乐于用最直接的方式去展现。你喜欢被突如其来的冒险所席卷，无论是深夜的即兴出逃，还是充满未知的角色扮演，都能点燃你的激情。你不是在寻找一个主人，而是在寻找一个能陪你一起疯的同类。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2I4MzI4MCIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyA0MCwyNSA2MCwyNSA3NSw0MCIgZmlsbD0iIzk3MjY2ZCIvPjxwYXRoIGQ9Ik0gMzUsNDggTCA0NSw1NSBNIDQ1LDQ4IEwgMzUsNTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNTUsNDggTCA2NSw1NSBNIDY1LDQ4IEwgNTUsNTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0gNDAsNjUgUSA1MCw3NSA2MCw2NSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PC9nPjwvc3ZnPg==` },
+        toughDog: { name: "狗坚强", acronym: "TOUGH", description: `你的座右铭是：“我可以被打倒，但绝不会被击败。”你拥有一副硬骨头和一颗大心脏，将忍耐和坚韧视为最高荣誉。在SM的世界里，你不是在承受痛苦，你是在刷新自己的“承伤记录”。\n\n你把自己的身体和意志当作一个需要不断升级的RPG角色，每一次挑战都是一次“打怪练级”。你享受那种在极限压力下，依然能咬紧牙关，甚至对你的“对手”挤出一个挑衅微笑的瞬间。别人看到的是“惨”，而你感受到的是“强”。你以自己惊人的耐受力为傲，并渴望遇到一个能真正让你“破防”的终极BOSS。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA4MCwxMDAgTCAyMCwxMDAgWiIgZmlsbD0iIzRhNTU2OCIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAyNSwyNSA3NSwyNSA3NSw0MCIgZmlsbD0iIzJkMzc0OCIvPjxyZWN0IHg9IjQ4IiB5PSI1NSIgd2lkdGg9IjQiIGhlaWdodD0iMTIiIGZpbGw9IiNhMGFlYzAiLz48cmVjdCB4PSIzNSIgeT0iNDgiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjM1IiB5PSI2OCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjIiIGZpbGw9IndoaXRlIi8+PC9nPjwvc3ZnPg==` },
+        loudDog: { name: "爱狗叫", acronym: "LOUD", description: `你的声音是你最强大的武器，也是你最性感的器官。你从不吝啬用叫声来表达自己的一切感受：愉悦、疼痛、乞求、兴奋……你的身体是一台顶级的信号处理器，能将任何输入都转化为高分贝的音频实时输出。\n\n你享受这种毫无保留的表达，并深知自己的声音对支配者是何等的鼓舞与引导。你的叫声不是杂乱的噪音，而是富有节奏和韵律的交响乐，是整个场景的背景音乐。你可以用声音示弱，也可以用声音挑衅。对你而言，一场沉默的互动，是无法想象的，因为那等于剥夺了你最核心的体验。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2VkODkzNiIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyA0MCwzMCA2MCwzMCA3NSw0MCIgZmlsbD0iI2RkNmIyMCIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNTAiIHI9IjQiIGZpbGw9IndoaXRlIi8+PGNpcmNsZSBjeD0iNjAiIGN5PSI1MCIgcj0iNCIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNIDQwLDYwIEMgNDUsNzUgNTUsNzUgNjAsNjAgQSAxMCAxMCAwIDAgMCA0MCw2MCIgZmlsbD0id2hpdGUiLz48L2c+PC9zdmc+` },
+        brattyDog: { name: "贱狗", acronym: "BRATTY", description: `你完美地诠释了什么叫“身在曹营心在汉”。即便在身体被完全控制的情况下，你的精神也永不为奴，并且会用尽一切可能的方式来“恶心”你的支配者。你会在被命令跪下时，偷偷用脚趾比个中指；会在被训斥时，用最无辜的眼神思考晚上吃什么。\n\n你的“贱”在于，总能用一种意想不到的方式，消解掉场景的严肃性，让高高在上的支配者瞬间破功。你享受这种在权力夹缝中寻找乐子的游戏，你的顺从永远带着一丝狡黠和不怀好意。你让对方明白，即使他能控制你的身体，也永远无法征服你那颗爱捣蛋的灵魂。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iIzM4YTE2OSIvPjxwYXRoIGQ9Ik0gMjUsNDAgUSA1MCwzMCA3NSw0MCBaIiBmaWxsPSIjMmY4NTVhIi8+PHBhdGggZD0iTSAzOCw1MiBBIDUgNSAwIDEgMSAzMiw1MiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTSA2MCw0OCBMIDY1LDU1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNIDQwLDYwIEwgNDUsNjUgTCA1MCw2MCBMIDU1LDY1IEwgNjAsNjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=` },
+        cravingDog: { name: "欠狗", acronym: "CRAVE", description: `你是一个情感上的极端体验追求者。平淡的温情无法满足你，你内心深处有一种“欠虐”的渴望，期待着被最猛烈的情感风暴所席卷。你不是在寻找一个温柔的主人，你是在寻找一个能将你推下悬崖的“恶人”。\n\n你渴望被逼到极限，渴望那种在崩溃边缘徘徊的战栗感。你的“欠”是一种主动的邀请，邀请对方用最激烈、最深刻的方式来对待你，让你体验到最极致的无助与沉沦。你坚信，只有在情感的废墟之上，才能感受到最彻底的释放和最真实的自我。你追求的不是被爱，而是被“摧毁”。`, imageUrl: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEyYSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAtMTApIj48cGF0aCBkPSJNIDI1LDQwIEMgMjUsMjAgNzUsMjAgNzUsNDAgTCA3MCwxMDAgTCAzMCwxMDAgWiIgZmlsbD0iI2U1M2UzZSIvPjxwYXRoIGQ9Ik0gMjUsNDAgQyAzNSw1NSA2NSw1NSA3NSw0MCIgZmlsbD0iI2M1MzAzMCIvPjxwYXRoIGQ9Ik0gNDAsNDggTCA0NSw1NSBMIDM1LDU1IFoiIGZpbGw9IndoaXRlIi8+PHBhdGggZD0iTSA2MCw0OCBMIDY1LDU1IEwgNTUsNTUgWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNIDQwLDY1IEEgMTAgMTAgMCAwIDAgNjAsNjUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=` }
+    };
+    
+    const questions = [{"question":"规划一次重要的长途旅行，你的风格更接近？","options":[{"text":"制作精确到小时的行程单，所有细节尽在掌握。","scores":{"hrHellraiser":2,"painAccountant":1}},{"text":"有一个大概的目的地和时间，具体行程可以灵活调整。","scores":{"hrHellraiser":1,"dungeonMaestro":1}},{"text":"只定好往返机票，剩下的交给命运和心情。","scores":{"dungeonMaestro":2,"wildDog":1}}]},
+        {"question":"和朋友聚会，大家在讨论一个你不认同的观点，你会？","options":[{"text":"明确指出对方的逻辑漏洞，并试图说服他们。","scores":{"hrHellraiser":1,"trollTyrant":2}},{"text":"保持微笑，内心吐槽，但不直接反驳，场面和谐最重要。","scores":{"trollTyrant":1,"goodDog":1}},{"text":"点头表示“你说得对”，然后找机会用行动唱反调。","scores":{"goodDog":2,"brattyDog":1}}]},
+        {"question":"面对一项充满挑战性的新工作，你的第一反应是？","options":[{"text":"太棒了！我喜欢这种极限压力，渴望征服它。","scores":{"toughDog":2,"riotConductor":1}},{"text":"评估风险和收益，寻找最稳妥的解决方案。","scores":{"toughDog":1,"hannibal":1}},{"text":"有点焦虑，希望能有清晰的指导和明确的步骤。","scores":{"hannibal":1,"goodDog":2}}]},
+        {"question":"你更喜欢哪种类型的电影？","options":[{"text":"情感极致浓烈，能让你哭到虚脱或笑到抽筋的电影。","scores":{"emotionalNuke":2,"cravingDog":2}},{"text":"情节烧脑，充满心理博弈和精妙布局的悬疑片。","scores":{"hannibal":2,"trollTyrant":1}},{"text":"氛围舒适，能带来温暖和治愈感的温情片。","scores":{"sensitiveDog":2,"comedian":1}}]},
+        {"question":"当你的伴侣情绪低落时，你倾向于？","options":[{"text":"逗TA笑，讲段子或做鬼脸，想尽办法让气氛活跃起来。","scores":{"comedian":2,"trollTyrant":1}},{"text":"给TA一个拥抱，安静地陪伴，不多问什么。","scores":{"comedian":1,"sensitiveDog":1}},{"text":"比TA更夸张地表现出悲伤，用戏剧化的方式转移其注意力。","scores":{"emotionalNuke":2,"riotConductor":1}}]},
+        {"question":"你如何看待“惊喜”？","options":[{"text":"讨厌不可控的感觉，更喜欢一切按计划进行。","scores":{"hrHellraiser":2}},{"text":"喜欢小惊喜，但前提是不能打乱我的核心计划。","scores":{"hrHellraiser":1,"dungeonMaestro":1}},{"text":"生活就是要充满惊喜！越是意想不到，越是刺激。","scores":{"dungeonMaestro":2,"wildDog":2}}]},
+        {"question":"在KTV里，你通常是？","options":[{"text":"那个掌控全场，安排谁唱什么歌、玩什么游戏的组织者。","scores":{"hrHellraiser":1,"riotConductor":2}},{"text":"那个深情投入，把每一首歌都唱成自己故事的情感麦霸。","scores":{"loudDog":2,"sensitiveDog":1}},{"text":"那个默默坐在角落，认真为朋友鼓掌或摇沙锤的听众。","scores":{"goodDog":2}}]},
+        {"question":"如果必须选择一种超能力，你会选？","options":[{"text":"读心术：精确洞悉他人内心的弱点和欲望。","scores":{"hannibal":2,"trollTyrant":1}},{"text":"绝对命令：说出的话，他人必须无条件服从。","scores":{"hrHellraiser":2,"riotConductor":1}},{"text":"无限耐力：可以承受任何程度的身体或精神压力。","scores":{"toughDog":2,"cravingDog":1}}]},
+        {"question":"和人发生争执后，你的处理方式是？","options":[{"text":"必须当天解决，哪怕大吵一架，也要把话说清楚。","scores":{"riotConductor":2,"emotionalNuke":1}},{"text":"冷处理，双方都需要空间和时间来冷静思考。","scores":{"painAccountant":1,"hannibal":1}},{"text":"立刻道歉，无论是不是我的错，我不想关系变得紧张。","scores":{"goodDog":2,"sensitiveDog":1}}]},
+        {"question":"你如何看待“犯错”这件事？","options":[{"text":"犯错就得认，挨打要立正。每一次错误都应有相应的代价。","scores":{"painAccountant":2,"hrHellraiser":1}},{"text":"错误是学习的机会，重要的是反思和成长。","scores":{"hannibal":1,"comedian":1}},{"text":"故意犯点无伤大雅的小错，看看对方的反应，很有趣。","scores":{"rebelDog":2,"brattyDog":2}}]},
+        {"question":"以下哪种场景更让你兴奋？","options":[{"text":"将一个混乱的房间整理得一尘不染，所有物品归于原位。","scores":{"hrHellraiser":2}},{"text":"在一个完全陌生的城市里，没有任何计划地随心漫游。","scores":{"dungeonMaestro":2,"wildDog":1}},{"text":"故意把一个整洁的房间弄得乱七八糟。","scores":{"rebelDog":2,"riotConductor":1}}]},
+        {"question":"在一段亲密关系中，你更看重？","options":[{"text":"极致的情感共鸣和灵魂的深度链接。","scores":{"sensitiveDog":2,"cravingDog":2}},{"text":"清晰的规则、默契的配合以及共同的目标。","scores":{"hrHellraiser":2,"painAccountant":1}},{"text":"永不枯竭的趣味性、玩笑和轻松的氛围。","scores":{"comedian":2,"trollTyrant":2}}]},
+        {"question":"收到一个指令时，你的第一反应是？","options":[{"text":"为什么？这个指令的目的是什么？有没有更好的方式？","scores":{"rebelDog":2,"hannibal":1}},{"text":"好的。收到。立刻执行。","scores":{"goodDog":2,"toughDog":1}},{"text":"表面说“好的”，实际执行的时候可能会偷偷打个折扣。","scores":{"brattyDog":2}}]},
+        {"question":"你认为最性感的声音是？","options":[{"text":"压抑着痛苦但又无法完全忍住的喘息声。","scores":{"painAccountant":1,"toughDog":2}},{"text":"毫无保留、尽情释放的哭喊或高叫。","scores":{"loudDog":2,"emotionalNuke":1}},{"text":"带着一丝戏谑和挑衅的顶嘴。","scores":{"trollTyrant":1,"rebelDog":2}}]},
+        {"question":"当事情变得棘手时，你更倾向于？","options":[{"text":"正面硬刚，哪怕头破血流也要死磕到底。","scores":{"toughDog":2,"riotConductor":1}},{"text":"迂回作战，用智慧和策略找到问题的突破口。","scores":{"hannibal":2,"trollTyrant":1}},{"text":"寻求帮助，或者干脆“躺平”，等待事情出现转机。","scores":{"goodDog":2,"sensitiveDog":1}}]},
+        {"question":"你如何表达强烈的爱意？","options":[{"text":"为对方倾尽所有，制造一场惊天动地、充满戏剧性的告白。","scores":{"riotConductor":1,"emotionalNuke":2}},{"text":"细致入微地观察和满足对方的一切需求，润物细无声。","scores":{"hannibal":2,"sensitiveDog":2}},{"text":"变着花样地“欺负”对方，惹TA生气再拼命哄好。","scores":{"trollTyrant":2,"rebelDog":1}}]},
+        {"question":"如果生活是一场游戏，你希望它是？","options":[{"text":"策略类游戏，每一步都需要深思熟虑，最终掌控全局。","scores":{"hrHellraiser":1,"hannibal":2}},{"text":"开放世界冒险游戏，充满了未知与自由探索的乐趣。","scores":{"dungeonMaestro":2,"wildDog":2}},{"text":"高难度动作游戏，享受在挑战极限和不断“受苦”中成长的过程。","scores":{"toughDog":2,"cravingDog":1}}]},
+        {"question":"“失控”对你来说意味着？","options":[{"text":"恐惧。必须不惜一切代价避免。","scores":{"hrHellraiser":2,"painAccountant":1}},{"text":"看情况，偶尔的失控是一种释放，但必须有个度。","scores":{"comedian":1,"sensitiveDog":1}},{"text":"兴奋！这正是我所追求的终极体验。","scores":{"riotConductor":2,"cravingDog":2}}]},
+        {"question":"你的幽默感更偏向于？","options":[{"text":"辛辣的讽刺和一针见血的吐槽。","scores":{"trollTyrant":2,"painAccountant":1}},{"text":"温暖的、自嘲式的，能让大家会心一笑的幽默。","scores":{"comedian":2,"sensitiveDog":1}},{"text":"通过夸张的肢体语言和恶作剧来逗乐别人。","scores":{"comedian":1,"brattyDog":2}}]},
+        {"question":"以下哪种夸奖更能让你开心？","options":[{"text":"“你真是个天才/疯子！”","scores":{"dungeonMaestro":2,"emotionalNuke":1}},{"text":"“你真可爱/真好欺负。”","scores":{"rebelDog":1,"brattyDog":2}},{"text":"“你真乖/真听话。”","scores":{"goodDog":2}}]},
+        {"question":"面对规则，你的态度是？","options":[{"text":"规则是用来打破的。","scores":{"rebelDog":2,"riotConductor":1}},{"text":"规则是用来利用的。","scores":{"trollTyrant":1,"brattyDog":2}},{"text":"规则是用来遵守的。","scores":{"hrHellraiser":1,"goodDog":2}}]},
+        {"question":"在一段关系中，你更害怕？","options":[{"text":"无聊，一成不变的重复。","scores":{"dungeonMaestro":2,"wildDog":1}},{"text":"冲突，剑拔弩张的紧张氛围。","scores":{"goodDog":1,"sensitiveDog":2}},{"text":"失去掌控，事情的发展超出了你的预期。","scores":{"hrHellraiser":2,"hannibal":1}}]},
+        {"question":"你的表达方式更接近？","options":[{"text":"直接、坦率，甚至有些不近人情。","scores":{"riotConductor":1,"painAccountant":2}},{"text":"委婉、细腻，善于通过暗示和氛围来传递信息。","scores":{"hannibal":2,"sensitiveDog":2}},{"text":"夸张、戏剧化，充满了强烈的情感色彩。","scores":{"emotionalNuke":2,"loudDog":1}}]},
+        {"question":"什么样的人最吸引你？","options":[{"text":"强大、自信、能为你提供绝对秩序和安全感的人。","scores":{"goodDog":2,"toughDog":1}},{"text":"有趣、狡黠、能看穿你的小把戏并陪你玩的人。","scores":{"comedian":1,"trollTyrant":2}},{"text":"敏感、脆弱、能被你轻易“掌控”和“玩弄”于股掌之间的人。","scores":{"hannibal":1,"riotConductor":2}}]},
+        {"question":"最后，你认为这一切的最终目的是？","options":[{"text":"体验极致的情感释放与灵魂共振。","scores":{"emotionalNuke":1,"cravingDog":2}},{"text":"一场心照不宣、充满智慧与趣味的成人游戏。","scores":{"comedian":1,"trollTyrant":2}},{"text":"建立一种牢不可破的、基于绝对信任与依赖的深刻联结。","scores":{"hrHellraiser":1,"goodDog":2}}]}];
+
+    const maxScores = { hrHellraiser: 22, dungeonMaestro: 12, trollTyrant: 20, riotConductor: 18, painAccountant: 12, hannibal: 18, comedian: 14, emotionalNuke: 14, goodDog: 22, sensitiveDog: 16, rebelDog: 18, wildDog: 10, toughDog: 14, loudDog: 6, brattyDog: 12, cravingDog: 14 };
+
+    // --- STATE & DOM ELEMENTS ---
+    let currentQuestionIndex = 0;
+    let scores = {};
+    const screens = { start: document.getElementById('start-screen'), quiz: document.getElementById('quiz-screen'), result: document.getElementById('result-screen') };
+    const progressBar = document.getElementById('progress-bar');
+    const questionHeader = document.getElementById('question-header');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+
+    // --- CORE FUNCTIONS ---
+    function switchScreen(screenName) {
+        Object.values(screens).forEach(screen => screen.classList.remove('active'));
+        screens[screenName].classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        scores = Object.keys(personalityTypes).reduce((acc, key) => ({ ...acc, [key]: 0 }), {});
+        displayQuestion();
+        switchScreen('quiz');
+    }
+
+    function displayQuestion() {
+        const question = questions[currentQuestionIndex];
+        progressBar.style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+        questionHeader.textContent = `问题 ${currentQuestionIndex + 1} / ${questions.length}`;
+        questionText.textContent = question.question;
+        optionsContainer.innerHTML = '';
+        question.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.textContent = option.text;
+            button.onclick = () => selectOption(option);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function selectOption(option) {
+        const scoresToAdd = option.scores;
+        for (const typeKey in scoresToAdd) {
+            if (scores.hasOwnProperty(typeKey)) {
+                scores[typeKey] += scoresToAdd[typeKey];
+            }
+        }
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            displayQuestion();
+        } else {
+            progressBar.style.width = '100%';
+            setTimeout(calculateAndShowResult, 500);
+        }
+    }
+
+    function calculateAndShowResult() {
+        const resultTypeKey = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        const result = personalityTypes[resultTypeKey];
+        
+        document.getElementById('result-name-short').textContent = result.name;
+        document.getElementById('result-acronym').textContent = result.acronym;
+        document.getElementById('result-image').src = result.imageUrl;
+        document.getElementById('result-type-full').textContent = `${result.name}`;
+        
+        const winnerScore = scores[resultTypeKey];
+        const maxScoreForType = maxScores[resultTypeKey];
+        const percentage = maxScoreForType > 0 ? Math.round((winnerScore / maxScoreForType) * 100) : 0;
+        document.getElementById('match-percentage').textContent = `${Math.min(99, percentage)}%`;
+        
+        document.getElementById('result-description').textContent = result.description;
+        switchScreen('result');
+    }
+
+    function restartQuiz() {
+        switchScreen('start');
+    }
+</script>
+
+</body>
+</html>
